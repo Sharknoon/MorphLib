@@ -4,11 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
- * @author Josua Frank
+ * Morphologische Operationen fuer Binaerbilder
+ * @author Josua Frank, Stefan Schmid
  */
 public class BinaryImageOperations extends BinaryImage<BinaryImageOperations> {
 
+    /**
+     * Invertiert dieses Bild
+     */
     public void invert() {
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
@@ -17,6 +20,10 @@ public class BinaryImageOperations extends BinaryImage<BinaryImageOperations> {
         }
     }
 
+    /**
+     * Fuehrt eine Erosion durch
+     * @param element Das Strukturelement {@link StandardStructureElements}
+     */
     public void erosion(StructureElement element) {
         //Algorithmus funktioniert nicht, die Pixel am Rand werden teilweise 
         //falsch interpretiert
@@ -72,6 +79,10 @@ public class BinaryImageOperations extends BinaryImage<BinaryImageOperations> {
         image = newImage;
     }
 
+    /**
+     * Fuehrt eine Dilation durch
+     * @param element Das Strukturelement {@link StandardStructureElements}
+     */
     public void dilation(StructureElement element) {
         int[] hotSpot = element.getHotSpot();
         boolean hotSpotElement = element.getElement(hotSpot[0], hotSpot[1]);
@@ -108,6 +119,9 @@ public class BinaryImageOperations extends BinaryImage<BinaryImageOperations> {
         image = newImage;
     }
 
+    /**
+     * Gibt die Kanten aus
+     */
     public void outline() {
         BinaryImageOperations clone = clone();
         clone.erosion(StandardStructureElements.FOUR);
@@ -121,14 +135,22 @@ public class BinaryImageOperations extends BinaryImage<BinaryImageOperations> {
         }
     }
 
+    /**
+     * Fuehrt ein Opening durch
+     * @param element Das Strukturelement {@link StandardStructureElements}
+     */
     public void opening(StructureElement element) {
         erosion(element);
         dilation(element);
     }
 
+    /**
+     * Fuehrt ein Closing durch
+     * @param element Das Strukturelement {@link StandardStructureElements}
+     */
     public void closing(StructureElement element) {
         dilation(element);
         erosion(element);
     }
-
+    
 }

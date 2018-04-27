@@ -1,13 +1,22 @@
 package asdf.morphlib;
 
 /**
- *
- * @author Josua Frank
+ * Verschiedene Standardstrukturelemente
+ * @author Josua Frank, Stefan Schmid
  */
 public class StandardStructureElements {
 
+    /**
+     * Vierer-Nachbarschaft
+     */
     public static final StructureElement FOUR;
+    /**
+     * Achter-Nachbarschaft
+     */
     public static final StructureElement EIGHT;
+    /**
+     * Small-Disc
+     */
     public static final StructureElement DISC;
 
     static {

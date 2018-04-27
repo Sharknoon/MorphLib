@@ -1,19 +1,20 @@
 package asdf.morphlib;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
+ * Diese Klasse erstellt und verwaltet Binaerbilder
  *
- * @author Josua Frank
+ * @author Josua Frank, Stefan Schmid
+ * @param <T> Die Subklasse
  */
 public class BinaryImage<T extends BinaryImage> {
 
@@ -21,9 +22,18 @@ public class BinaryImage<T extends BinaryImage> {
     public int height = 0;
     public boolean[][] image = new boolean[0][0];
 
+    /**
+     * Parameterloser Konstruktor
+     */
     public BinaryImage() {
     }
 
+    /**
+     * Konstruktor mit n x m
+     *
+     * @param width Die Breite
+     * @param height Die Hoehe
+     */
     public BinaryImage(int width, int height) {
         if (width <= 0 || height <= 0) {
             throw new IllegalArgumentException("Bild muss mindestens 1x1 Pixel gross sein");
@@ -33,6 +43,13 @@ public class BinaryImage<T extends BinaryImage> {
         this.image = new boolean[width][height];
     }
 
+    /**
+     * Setzt einen Pixel auf einen gewuenschten Wert (0/1)
+     *
+     * @param x Die X-Koordinate
+     * @param y Die Y-Koordinate
+     * @param pixel Der gewuenschte Wert
+     */
     public void setPixel(int x, int y, boolean pixel) {
         if (x < 0 || y < 0 || x >= width || y >= height) {
             throw new IllegalArgumentException("Pixel nicht im Bild enthalten");
@@ -40,6 +57,13 @@ public class BinaryImage<T extends BinaryImage> {
         image[x][y] = pixel;
     }
 
+    /**
+     * Gibt den gewuenschten Pixelwert zurueck
+     *
+     * @param x Die X-Koordinate
+     * @param y Die Y-Koordinate
+     * @return Der gewuenschte Pixelwert
+     */
     public boolean getPixel(int x, int y) {
         if (x < 0 || y < 0 || x >= width || y >= height) {
             throw new IllegalArgumentException("Pixel nicht im Bild enthalten");
@@ -47,6 +71,11 @@ public class BinaryImage<T extends BinaryImage> {
         return image[x][y];
     }
 
+    /**
+     * Ueberschreibt dieses Binaerbild mit einem neuen Bild
+     *
+     * @param image Das neue Bild als zwei-dimensionales ([x][y]) boolean-array
+     */
     public void setImage(boolean[][] image) {
         if (image == null) {
             throw new IllegalArgumentException("Das uebergebene Bild ist null");
@@ -56,14 +85,22 @@ public class BinaryImage<T extends BinaryImage> {
         this.height = image[0].length;
     }
 
+    /**
+     * Gibt das Bild aus
+     */
     public void print() {
         System.out.println(toString());
     }
 
+    /**
+     * Dupliziert das Bild und gibt es zurueck
+     *
+     * @return Das duplizierte Bild
+     */
     public T clone() {
         try {
             Class<T> class_ = (Class<T>) this.getClass();
-            T clone = class_.newInstance();
+            T clone = class_.getDeclaredConstructor().newInstance();
 
             int length = image.length;
             boolean[][] target = new boolean[length][image[0].length];
@@ -72,12 +109,21 @@ public class BinaryImage<T extends BinaryImage> {
             }
             clone.setImage(target);
             return clone;
-        } catch (InstantiationException | IllegalAccessException ex) {
-            Logger.getLogger(BinaryImage.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InstantiationException
+                | IllegalAccessException
+                | NoSuchMethodException
+                | SecurityException
+                | IllegalArgumentException
+                | InvocationTargetException ex) {
+            throw new IllegalArgumentException("Konnte neue Instanz nicht erstellen");
         }
-        return null;
     }
 
+    /**
+     * Speichert das Bild
+     *
+     * @param path Der Pfad an dem das Bild gespeichert werden soll
+     */
     public void save(Path path) {
         if (path == null) {
             throw new IllegalArgumentException("Pfad ist nicht spezifiziert");
@@ -86,10 +132,10 @@ public class BinaryImage<T extends BinaryImage> {
             Files.deleteIfExists(path);
             List<String> linesToWrite = new ArrayList<>();
             StringBuilder builder = new StringBuilder();
-            for (boolean[] line : image) {
+            for (int y = 0; y < height; y++) {
                 builder.setLength(0);
-                for (boolean pixel : line) {
-                    builder.append(pixel ? 1 : 0);
+                for (int x = 0; x < width; x++) {
+                    builder.append(image[x][y] ? 1 : 0);
                 }
                 linesToWrite.add(builder.toString());
             }
@@ -101,6 +147,10 @@ public class BinaryImage<T extends BinaryImage> {
         }
     }
 
+    /**
+     * Laedt eine gewuenschte Datei
+     * @param path Die gewuenschte Datei
+     */
     public void load(Path path) {
         if (path == null) {
             throw new IllegalArgumentException("Pfad ist nicht spezifiziert");
@@ -130,6 +180,10 @@ public class BinaryImage<T extends BinaryImage> {
         }
     }
 
+    /**
+     * Gibt das Bild als String zurueck
+     * @return Das Bild als String
+     */
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
