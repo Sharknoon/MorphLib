@@ -16,8 +16,8 @@ public class StructureElement {
     }
 
     public StructureElement(int width, int height, int hotSpotX, int hotSpotY) {
-        if (width <= 0 || height <= 0) {
-            throw new IllegalArgumentException("Bild muss mindestens 1x1 Pixel gross sein");
+        if (width <= 0 || height <= 0 || hotSpotX < 0 || hotSpotX >= width || hotSpotY < 0 || hotSpotY >= height) {
+            throw new IllegalArgumentException("Bild muss mindestens 1x1 Pixel gross sein und der Hot Spot muss im Bild liegen");
         }
         this.width = width;
         this.height = height;
@@ -55,5 +55,20 @@ public class StructureElement {
     public boolean[][] getStructureElement() {
         return structure;
     }
-    
+
+    public void reflect() {
+        if (width < 1 || height < 1) {
+            return;
+        }
+        boolean[][] newStructure = new boolean[width][height];
+        for (int y = 0; y < height; y++) {
+            boolean[] line = structure[y];
+            for (int x = 0; x < width; x++) {
+                boolean element = line[x];
+                newStructure[width - 1 - x][height - 1 - y] = element;
+            }
+        }
+        structure = newStructure;
+    }
+
 }

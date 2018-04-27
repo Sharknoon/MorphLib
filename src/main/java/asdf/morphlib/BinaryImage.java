@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
  *
  * @author Josua Frank
  */
-public class BinaryImage {
+public class BinaryImage<T extends BinaryImage> {
 
     public int width = 0;
     public int height = 0;
@@ -57,25 +57,25 @@ public class BinaryImage {
     }
 
     public void print() {
-        for (boolean[] row : this.image) {
-            for (boolean pixel : row) {
-                System.out.print(pixel ? "■" : "□");
-            }
-            System.out.println();
-        }
+        System.out.println(toString());
     }
 
-    @Override
-    public BinaryImage clone() throws CloneNotSupportedException {
-        super.clone();
-        BinaryImage clone = new BinaryImage();
-        int length = image.length;
-        boolean[][] target = new boolean[length][image[0].length];
-        for (int i = 0; i < length; i++) {
-            System.arraycopy(image[i], 0, target[i], 0, image[i].length);
+    public T clone() {
+        try {
+            Class<T> class_ = (Class<T>) this.getClass();
+            T clone = class_.newInstance();
+
+            int length = image.length;
+            boolean[][] target = new boolean[length][image[0].length];
+            for (int i = 0; i < length; i++) {
+                System.arraycopy(image[i], 0, target[i], 0, image[i].length);
+            }
+            clone.setImage(target);
+            return clone;
+        } catch (InstantiationException | IllegalAccessException ex) {
+            Logger.getLogger(BinaryImage.class.getName()).log(Level.SEVERE, null, ex);
         }
-        clone.setImage(target);
-        return clone;
+        return null;
     }
 
     public void save(Path path) {
@@ -128,6 +128,18 @@ public class BinaryImage {
         } catch (IOException | IllegalArgumentException | SecurityException e) {
             throw new IllegalArgumentException("Fehler beim einlesen der Datei " + e);
         }
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                builder.append(image[x][y] ? "1" : "0");
+            }
+            builder.append("\n");
+        }
+        return builder.toString();
     }
 
 }
